@@ -6,6 +6,7 @@ RSPAMD_ADDR="${RSPAMD_ADDR:-localhost:11332}"
 OPENDKIM_ADDR="${OPENDKIM_ADDR:-}"
 POSTSRSD_HOST="${POSTSRSD_HOST:-yarilo-postsrsd}"
 LMTP_ADDR="${LMTP_ADDR:-}"
+SASL_LOGIN_ADDR="${SASL_LOGIN_ADDR:-}"
 
 postconf -e "relayhost ="
 
@@ -31,3 +32,25 @@ postconf -e "milter_default_action = accept"
 postconf -e "milter_protocol = 6"
 postconf -e "smtpd_milters = ${_milters}"
 postconf -e "non_smtpd_milters = \$smtpd_milters"
+
+if [ -f "/run/postfix/tls/tls.crt" ]; then
+    _sasl_opts=""
+    if [ -n "${SASL_LOGIN_ADDR}" ]; then
+        postconf -e "smtpd_sasl_type = dovecot"
+        postconf -e "smtpd_sasl_path = inet:${SASL_LOGIN_ADDR}"
+        postconf -e "smtpd_sasl_auth_enable = yes"
+        postconf -e "smtpd_sasl_security_options = noanonymous"
+        _sasl_opts="  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_relay_restrictions=permit_mynetworks,permit_sasl_authenticated,reject"
+    else
+        _sasl_opts="  -o smtpd_relay_restrictions=permit_mynetworks,reject"
+    fi
+
+    cat >> /etc/postfix/master.cf << EOF
+submission inet n       -       n       -       -       smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_tls_security_level=encrypt
+${_sasl_opts}
+  -o milter_macro_daemon_name=ORIGINATING
+EOF
+fi
