@@ -9,8 +9,8 @@ image:
     pullPolicy: IfNotPresent
   postsrsd:
     repository: ghcr.io/0kaba0hub/postsrsd
-    tag: latest
-    pullPolicy: Always
+    tag: "2.1.0-1"
+    pullPolicy: IfNotPresent
 
 mail:
   domain: example.com
