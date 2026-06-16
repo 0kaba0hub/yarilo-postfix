@@ -9,7 +9,7 @@ image:
     pullPolicy: IfNotPresent
   postsrsd:
     repository: ghcr.io/0kaba0hub/postsrsd
-    tag: "2.1.0-3"
+    tag: "2.1.0-4"
     pullPolicy: IfNotPresent
 
 mail:
