@@ -7,7 +7,7 @@ metadata:
 data:
   actions.conf: |
     reject = {{ .Values.fwd.rspamd.rejectScore }};
-    add_header = {{ .Values.fwd.rspamd.addHeaderScore }};
+    add_header = {{ .Values.fwd.rspamd.rejectScore }};
   dkim_signing.conf: |
     enabled = true;
     use_domain = "envelope";
