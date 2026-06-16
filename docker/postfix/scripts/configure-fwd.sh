@@ -46,6 +46,7 @@ mech_list: PLAIN LOGIN
 SASLCF
         cp /etc/postfix/sasl/smtpd.conf /etc/sasl2/smtpd.conf
         printf '%s' "${SASL_PASSWORD}" | saslpasswd2 -c -f /etc/sasldb2 -u "${MAIL_DOMAIN}" -p "${SASL_USER}"
+        [ -f /etc/sasldb2 ] || { echo "FATAL: saslpasswd2 did not create /etc/sasldb2" >&2; exit 1; }
         chown postfix:postfix /etc/sasldb2
         chmod 640 /etc/sasldb2
         postconf -e "smtpd_sasl_type = cyrus"

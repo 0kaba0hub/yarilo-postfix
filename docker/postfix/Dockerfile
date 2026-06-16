@@ -6,7 +6,7 @@ RUN apk add --no-cache \
     ca-certificates \
     cyrus-sasl \
     cyrus-sasl-login \
-    cyrus-sasl-utils \
+    db \
     && mkdir -p /etc/postfix/sasl /etc/sasl2
 COPY scripts/entrypoint.sh /entrypoint.sh
 COPY scripts/common.sh /common.sh
