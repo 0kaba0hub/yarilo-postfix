@@ -14,8 +14,7 @@ if [ -n "${LMTP_ADDR}" ]; then
     postconf -e "lmtp_host_lookup = native"
 fi
 
-postconf -e "sender_canonical_maps = socketmap:inet:${POSTSRSD_HOST}:10003:forward"
-postconf -e "sender_canonical_classes = envelope_sender"
+postconf -e "smtp_generic_maps = socketmap:inet:${POSTSRSD_HOST}:10003:forward"
 postconf -e "recipient_canonical_maps = socketmap:inet:${POSTSRSD_HOST}:10003:reverse"
 postconf -e "recipient_canonical_classes = envelope_recipient,header_recipient"
 
@@ -24,5 +23,5 @@ postconf -e "smtpd_recipient_restrictions = permit_mynetworks, reject_unauth_des
 
 postconf -e "milter_default_action = accept"
 postconf -e "milter_protocol = 6"
-postconf -e "smtpd_milters = inet:${RSPAMD_ADDR},inet:${POSTSRSD_HOST}:10001"
+postconf -e "smtpd_milters = inet:${RSPAMD_ADDR}"
 postconf -e "non_smtpd_milters = \$smtpd_milters"
