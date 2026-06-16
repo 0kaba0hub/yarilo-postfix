@@ -69,6 +69,7 @@ fwd:
 
 postsrsd:
   enabled: false
+  domain: ""
   secretName: ""
   redisAddr: ""
   service:

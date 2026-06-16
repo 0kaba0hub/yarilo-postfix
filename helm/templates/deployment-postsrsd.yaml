@@ -27,7 +27,7 @@ spec:
               name: socketmap
           env:
             - name: SRS_DOMAIN
-              value: {{ .Values.mail.domain | quote }}
+              value: {{ .Values.postsrsd.domain | default .Values.mail.domain | quote }}
             {{- if .Values.postsrsd.secretName }}
             - name: SRS_SECRET
               valueFrom:

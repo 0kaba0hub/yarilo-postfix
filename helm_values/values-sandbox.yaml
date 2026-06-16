@@ -57,6 +57,7 @@ fwd:
 
 postsrsd:
   enabled: true
+  domain: mail-sb.seconddns.com
   secretName: postsrsd-secret
   service:
     type: ClusterIP
