@@ -4,7 +4,9 @@ RUN apk add --no-cache \
     postfix-mysql \
     postfix-pcre \
     ca-certificates \
-    cyrus-sasl
+    cyrus-sasl \
+    cyrus-sasl-login \
+    && mkdir -p /etc/postfix/sasl /etc/sasl2
 COPY scripts/entrypoint.sh /entrypoint.sh
 COPY scripts/common.sh /common.sh
 COPY scripts/configure-mx.sh /configure-mx.sh
