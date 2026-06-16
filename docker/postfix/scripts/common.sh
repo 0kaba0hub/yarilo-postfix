@@ -26,7 +26,7 @@ MYSQL_DBNAME="${MYSQL_DBNAME:-yarilo}"
 
 _gen_mysql_cf() {
     local _file="$1" _query="$2"
-    printf 'hosts = %s\nuser = %s\npassword = %s\ndbname = %s\nquery = %s\n' \
+    printf 'hosts = %s\nuser = %s\npassword = %s\ndbname = %s\nquery = %s\ntls_verify_cert = no\n' \
         "${MYSQL_HOST}" "${MYSQL_USER}" "${MYSQL_PASSWORD}" "${MYSQL_DBNAME}" "${_query}" \
         > "${_file}"
     chmod 640 "${_file}"
@@ -35,7 +35,9 @@ _gen_mysql_cf() {
 _gen_mysql_cf /etc/postfix/mysql-domains.cf \
     "SELECT domain FROM domain WHERE domain='%s' AND active=1"
 _gen_mysql_cf /etc/postfix/mysql-aliases.cf \
-    "SELECT goto FROM alias WHERE address='%s' AND active=1"
+    "SELECT goto FROM alias WHERE address='%s' AND active=1 UNION ALL SELECT goto FROM alias WHERE address='@%d' AND active=1 AND NOT EXISTS (SELECT 1 FROM alias WHERE address='%s' AND active=1)"
+_gen_mysql_cf /etc/postfix/mysql-mailbox.cf \
+    "SELECT username FROM mailbox WHERE username='%s' AND active=1"
 
 postconf -e "smtp_tls_security_level = may"
 postconf -e "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt"

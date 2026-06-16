@@ -10,13 +10,13 @@ mail:
   mynetworks: "127.0.0.0/8 10.0.0.0/8 10.1.0.0/16"
 
 yarilo:
-  saslLoginAddr: "yarilo-sasl-login.yarilo-sb.svc:12325"
-  lmtpHost: "yarilo-lmtp.yarilo-sb.svc"
+  saslLoginAddr: "yarilo-sasl-login.yarilo-sb.svc.cluster.local:12325"
+  lmtpHost: "yarilo-lmtp-login.yarilo-sb.svc.cluster.local"
   lmtpPort: "24"
 
 mysql:
   secretName: yarilo-mysql
-  host: "yarilo-mysql.yarilo-sb.svc"
+  host: "yarilo-mysql.yarilo-sb.svc.cluster.local"
 
 tls:
   secretName: yarilo-tls
@@ -29,7 +29,7 @@ rspamd:
   addHeaderScore: 6
 
 opendkim:
-  enabled: false
+  enabled: true
 
 mx:
   enabled: true
