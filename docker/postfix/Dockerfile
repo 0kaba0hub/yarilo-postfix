@@ -1,9 +1,11 @@
-FROM alpine:3.23
+FROM alpine:3.24
 RUN apk add --no-cache \
     postfix \
     postfix-mysql \
     postfix-pcre \
-    ca-certificates
+    ca-certificates \
+    cyrus-sasl \
+    cyrus-sasl-plain
 COPY scripts/entrypoint.sh /entrypoint.sh
 COPY scripts/common.sh /common.sh
 COPY scripts/configure-mx.sh /configure-mx.sh
