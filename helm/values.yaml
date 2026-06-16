@@ -1,0 +1,92 @@
+image:
+  postfix:
+    repository: ghcr.io/0kaba0hub/yarilo-postfix
+    tag: latest
+    pullPolicy: Always
+  rspamd:
+    repository: rspamd/rspamd
+    tag: "3.11.1"
+    pullPolicy: IfNotPresent
+  postsrsd:
+    repository: ghcr.io/roehling/postsrsd
+    tag: "2.0.8"
+    pullPolicy: IfNotPresent
+
+mail:
+  domain: example.com
+  hostname: mail.example.com
+  mynetworks: "127.0.0.0/8 10.0.0.0/8"
+  # Additional virtual domains beyond mail.domain (space-separated).
+  extraDomains: ""
+
+yarilo:
+  saslLoginAddr: ""
+  lmtpAddr: ""
+
+tls:
+  secretName: ""
+
+dkim:
+  secretName: ""
+  selector: mail
+
+mx:
+  enabled: false
+  # Space-separated Postfix reject_rbl_client entries appended to smtpd_recipient_restrictions.
+  rblRestrictions: "reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net"
+  rspamd:
+    rejectScore: 15
+    addHeaderScore: 6
+  service:
+    type: ClusterIP
+    port: 25
+    annotations: {}
+
+mta:
+  enabled: false
+  rspamd:
+    rejectScore: 15
+    addHeaderScore: 6
+  service:
+    type: ClusterIP
+    port: 587
+    annotations: {}
+
+fwd:
+  enabled: false
+  lmtpAddr: ""
+  rspamd:
+    rejectScore: 100
+  service:
+    type: ClusterIP
+    port: 25
+    annotations: {}
+
+postsrsd:
+  enabled: false
+  secretName: ""
+  service:
+    type: ClusterIP
+
+resources:
+  postfix:
+    requests:
+      cpu: 20m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+  rspamd:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  postsrsd:
+    requests:
+      cpu: 10m
+      memory: 16Mi
+    limits:
+      cpu: 100m
+      memory: 32Mi

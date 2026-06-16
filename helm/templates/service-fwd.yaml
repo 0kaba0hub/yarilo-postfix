@@ -1,0 +1,21 @@
+{{- if .Values.fwd.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: relay-fwd
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: relay-fwd
+  {{- with .Values.fwd.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.fwd.service.type }}
+  selector:
+    app: relay-fwd
+  ports:
+    - name: smtp
+      port: {{ .Values.fwd.service.port }}
+      targetPort: smtp
+{{- end }}

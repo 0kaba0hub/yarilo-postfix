@@ -1,0 +1,20 @@
+{{- if .Values.mta.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: relay-rspamd-mta
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: relay-rspamd-mta
+spec:
+  type: ClusterIP
+  selector:
+    app: relay-rspamd-mta
+  ports:
+    - name: milter
+      port: 11332
+      targetPort: milter
+    - name: web
+      port: 11334
+      targetPort: web
+{{- end }}
