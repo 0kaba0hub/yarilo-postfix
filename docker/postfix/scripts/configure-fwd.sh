@@ -14,7 +14,8 @@ if [ -n "${LMTP_ADDR}" ]; then
     postconf -e "lmtp_host_lookup = native"
 fi
 
-postconf -e "smtp_generic_maps = socketmap:inet:${POSTSRSD_HOST}:10003:forward"
+postconf -e "sender_canonical_maps = socketmap:inet:${POSTSRSD_HOST}:10003:forward"
+postconf -e "sender_canonical_classes = envelope_sender"
 postconf -e "recipient_canonical_maps = socketmap:inet:${POSTSRSD_HOST}:10003:reverse"
 postconf -e "recipient_canonical_classes = envelope_recipient,header_recipient"
 
