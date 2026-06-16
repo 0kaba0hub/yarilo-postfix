@@ -57,6 +57,6 @@ fwd:
 
 postsrsd:
   enabled: true
-  secretName: ""
+  secretName: postsrsd-secret
   service:
     type: ClusterIP
