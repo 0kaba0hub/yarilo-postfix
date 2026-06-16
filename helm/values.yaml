@@ -7,6 +7,10 @@ image:
     repository: rspamd/rspamd
     tag: "4.1.0"
     pullPolicy: IfNotPresent
+  opendkim:
+    repository: instrumentisto/opendkim
+    tag: "2.11"
+    pullPolicy: IfNotPresent
   postsrsd:
     repository: ghcr.io/0kaba0hub/postsrsd
     tag: "2.1.0-5"
@@ -32,16 +36,19 @@ tls:
   secretName: ""
 
 dkim:
-  secretName: ""
-  selector: mail
+  selector: defaultmail
+
+rspamd:
+  rejectScore: 15
+  addHeaderScore: 6
+
+opendkim:
+  enabled: false
 
 mx:
   enabled: false
   # Space-separated Postfix reject_rbl_client entries appended to smtpd_recipient_restrictions.
   rblRestrictions: "reject_rbl_client zen.spamhaus.org, reject_rbl_client bl.spamcop.net"
-  rspamd:
-    rejectScore: 15
-    addHeaderScore: 6
   service:
     type: ClusterIP
     port: 25
@@ -49,9 +56,6 @@ mx:
 
 mta:
   enabled: false
-  rspamd:
-    rejectScore: 15
-    addHeaderScore: 6
   service:
     type: ClusterIP
     port: 587
@@ -60,8 +64,6 @@ mta:
 fwd:
   enabled: false
   lmtpAddr: ""
-  rspamd:
-    rejectScore: 100
   service:
     type: ClusterIP
     port: 25
@@ -91,6 +93,13 @@ resources:
     limits:
       cpu: 500m
       memory: 256Mi
+  opendkim:
+    requests:
+      cpu: 10m
+      memory: 16Mi
+    limits:
+      cpu: 100m
+      memory: 32Mi
   postsrsd:
     requests:
       cpu: 10m

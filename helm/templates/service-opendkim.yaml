@@ -1,0 +1,14 @@
+{{- if .Values.opendkim.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: relay-opendkim
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: relay-opendkim
+  ports:
+    - name: milter
+      port: 8891
+      targetPort: 8891
+{{- end }}

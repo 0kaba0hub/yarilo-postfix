@@ -37,7 +37,11 @@ spec:
             - name: MAIL_DOMAINS
               value: {{ include "yarilo-postfix.mailDomains" . | quote }}
             - name: RSPAMD_ADDR
-              value: "relay-rspamd-fwd:11332"
+              value: "relay-rspamd:11332"
+            {{- if .Values.opendkim.enabled }}
+            - name: OPENDKIM_ADDR
+              value: "relay-opendkim:8891"
+            {{- end }}
             - name: POSTSRSD_HOST
               value: "relay-postsrsd"
             {{- if .Values.fwd.lmtpAddr }}

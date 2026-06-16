@@ -1,0 +1,46 @@
+{{- if .Values.opendkim.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: relay-opendkim
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: relay-opendkim
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: relay-opendkim
+  template:
+    metadata:
+      labels:
+        app: relay-opendkim
+    spec:
+      containers:
+        - name: opendkim
+          image: "{{ .Values.image.opendkim.repository }}:{{ .Values.image.opendkim.tag }}"
+          imagePullPolicy: {{ .Values.image.opendkim.pullPolicy }}
+          ports:
+            - containerPort: 8891
+              name: milter
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              cat > /tmp/opendkim.conf << CONF
+              Mode                s
+              Canonicalization    relaxed/simple
+              Socket              inet:8891@0.0.0.0
+              Syslog              yes
+              SyslogSuccess       yes
+              LogWhy              yes
+              InternalHosts       0.0.0.0/0,::/0
+              SigningTable        dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim_keys?keycol=domain?datacol=id
+              KeyTable            dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim_keys?keycol=id?datacol=domain,selector,private_key
+              OversignHeaders     From
+              CONF
+              exec opendkim -f -x /tmp/opendkim.conf
+          env:
+            {{- include "yarilo-postfix.mysqlEnv" .Values | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.opendkim | nindent 12 }}
+{{- end }}

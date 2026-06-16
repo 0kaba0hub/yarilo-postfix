@@ -3,6 +3,7 @@ set -eu
 . /common.sh
 
 RSPAMD_ADDR="${RSPAMD_ADDR:-localhost:11332}"
+OPENDKIM_ADDR="${OPENDKIM_ADDR:-}"
 POSTSRSD_HOST="${POSTSRSD_HOST:-yarilo-postsrsd}"
 LMTP_ADDR="${LMTP_ADDR:-}"
 
@@ -22,7 +23,11 @@ postconf -e "recipient_canonical_classes = envelope_recipient,header_recipient"
 postconf -e "smtpd_relay_restrictions = permit_mynetworks reject_unauth_destination"
 postconf -e "smtpd_recipient_restrictions = permit_mynetworks, reject_unauth_destination"
 
+_milters="inet:${RSPAMD_ADDR}"
+if [ -n "${OPENDKIM_ADDR}" ]; then
+    _milters="${_milters},inet:${OPENDKIM_ADDR}"
+fi
 postconf -e "milter_default_action = accept"
 postconf -e "milter_protocol = 6"
-postconf -e "smtpd_milters = inet:${RSPAMD_ADDR}"
+postconf -e "smtpd_milters = ${_milters}"
 postconf -e "non_smtpd_milters = \$smtpd_milters"
