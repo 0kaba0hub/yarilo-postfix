@@ -1,0 +1,56 @@
+{{- if .Values.mta.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: relay-mta
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: relay-mta
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: relay-mta
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: relay-mta
+    spec:
+      containers:
+        - name: postfix
+          image: "{{ .Values.image.postfix.repository }}:{{ .Values.image.postfix.tag }}"
+          imagePullPolicy: {{ .Values.image.postfix.pullPolicy }}
+          ports:
+            - containerPort: 25
+              name: smtp
+            - containerPort: 587
+              name: submission
+          env:
+            - name: RELAY_TYPE
+              value: mta
+            - name: MAIL_DOMAIN
+              value: {{ .Values.mail.domain | quote }}
+            - name: MAIL_HOSTNAME
+              value: {{ .Values.mail.hostname | quote }}
+            - name: MAIL_MYNETWORKS
+              value: {{ .Values.mail.mynetworks | quote }}
+            - name: MAIL_DOMAINS
+              value: {{ include "yarilo-postfix.mailDomains" . | quote }}
+            - name: LMTP_HOST
+              value: {{ .Values.yarilo.lmtpHost | quote }}
+            - name: LMTP_PORT
+              value: {{ .Values.yarilo.lmtpPort | quote }}
+            - name: SASL_LOGIN_ADDR
+              value: {{ .Values.yarilo.saslLoginAddr | quote }}
+            - name: RSPAMD_ADDR
+              value: "relay-rspamd-mta:11332"
+            {{- include "yarilo-postfix.mysqlEnv" .Values | nindent 12 }}
+          volumeMounts:
+            {{- include "yarilo-postfix.tlsMount" .Values.tls.secretName | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.postfix | nindent 12 }}
+      volumes:
+        {{- include "yarilo-postfix.tlsVolume" .Values.tls.secretName | nindent 8 }}
+{{- end }}

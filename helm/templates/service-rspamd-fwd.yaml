@@ -1,0 +1,20 @@
+{{- if .Values.fwd.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: relay-rspamd-fwd
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: relay-rspamd-fwd
+spec:
+  type: ClusterIP
+  selector:
+    app: relay-rspamd-fwd
+  ports:
+    - name: milter
+      port: 11332
+      targetPort: milter
+    - name: web
+      port: 11334
+      targetPort: web
+{{- end }}

@@ -1,0 +1,40 @@
+{{- if .Values.fwd.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: relay-rspamd-fwd
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: relay-rspamd-fwd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: relay-rspamd-fwd
+  template:
+    metadata:
+      labels:
+        app: relay-rspamd-fwd
+    spec:
+      containers:
+        - name: rspamd
+          image: "{{ .Values.image.rspamd.repository }}:{{ .Values.image.rspamd.tag }}"
+          imagePullPolicy: {{ .Values.image.rspamd.pullPolicy }}
+          ports:
+            - containerPort: 11332
+              name: milter
+            - containerPort: 11334
+              name: web
+          volumeMounts:
+            - name: config
+              mountPath: /etc/rspamd/local.d
+              readOnly: true
+            {{- include "yarilo-postfix.dkimMount" .Values.dkim.secretName | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.rspamd | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: rspamd-fwd-config
+        {{- include "yarilo-postfix.dkimVolume" .Values.dkim.secretName | nindent 8 }}
+{{- end }}

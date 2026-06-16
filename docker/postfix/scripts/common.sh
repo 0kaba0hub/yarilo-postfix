@@ -1,0 +1,47 @@
+#!/bin/sh
+MAIL_DOMAIN="${MAIL_DOMAIN:-example.com}"
+MAIL_HOSTNAME="${MAIL_HOSTNAME:-mail.example.com}"
+MAIL_MYNETWORKS="${MAIL_MYNETWORKS:-127.0.0.0/8 10.0.0.0/8}"
+MAIL_DOMAINS="${MAIL_DOMAINS:-${MAIL_DOMAIN}}"
+
+postconf -e "myhostname = ${MAIL_HOSTNAME}"
+postconf -e "smtp_helo_name = ${MAIL_HOSTNAME}"
+postconf -e "mydomain = ${MAIL_DOMAIN}"
+postconf -e "myorigin = ${MAIL_DOMAIN}"
+postconf -e "inet_interfaces = all"
+postconf -e "inet_protocols = ipv4"
+postconf -e "mydestination = localhost"
+postconf -e "biff = no"
+postconf -e "append_dot_mydomain = no"
+postconf -e "maillog_file = /dev/stdout"
+postconf -e "mynetworks = ${MAIL_MYNETWORKS}"
+postconf -e "smtpd_banner = \$myhostname ESMTP"
+
+MYSQL_HOST="${MYSQL_HOST:-localhost}"
+MYSQL_USER="${MYSQL_USER:-postfix}"
+MYSQL_PASSWORD="${MYSQL_PASSWORD:-}"
+MYSQL_DBNAME="${MYSQL_DBNAME:-yarilo}"
+
+_gen_mysql_cf() {
+    local _file="$1" _query="$2"
+    printf 'hosts = %s\nuser = %s\npassword = %s\ndbname = %s\nquery = %s\n' \
+        "${MYSQL_HOST}" "${MYSQL_USER}" "${MYSQL_PASSWORD}" "${MYSQL_DBNAME}" "${_query}" \
+        > "${_file}"
+    chmod 640 "${_file}"
+}
+
+_gen_mysql_cf /etc/postfix/mysql-domains.cf \
+    "SELECT domain FROM domain WHERE domain='%s' AND active=1"
+_gen_mysql_cf /etc/postfix/mysql-aliases.cf \
+    "SELECT goto FROM alias WHERE address='%s' AND active=1"
+
+postconf -e "smtp_tls_security_level = may"
+postconf -e "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt"
+postconf -e "smtp_tls_loglevel = 1"
+
+if [ -f "/run/postfix/tls/tls.crt" ]; then
+    postconf -e "smtpd_tls_cert_file = /run/postfix/tls/tls.crt"
+    postconf -e "smtpd_tls_key_file = /run/postfix/tls/tls.key"
+    postconf -e "smtpd_tls_security_level = may"
+    postconf -e "smtpd_tls_loglevel = 1"
+fi

@@ -1,0 +1,21 @@
+{{- if .Values.mx.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: relay-mx
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: relay-mx
+  {{- with .Values.mx.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.mx.service.type }}
+  selector:
+    app: relay-mx
+  ports:
+    - name: smtp
+      port: {{ .Values.mx.service.port }}
+      targetPort: smtp
+{{- end }}

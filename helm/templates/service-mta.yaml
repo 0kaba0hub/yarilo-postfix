@@ -1,0 +1,24 @@
+{{- if .Values.mta.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: relay-mta
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: relay-mta
+  {{- with .Values.mta.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.mta.service.type }}
+  selector:
+    app: relay-mta
+  ports:
+    - name: smtp
+      port: 25
+      targetPort: smtp
+    - name: submission
+      port: {{ .Values.mta.service.port }}
+      targetPort: submission
+{{- end }}

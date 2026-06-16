@@ -1,0 +1,40 @@
+{{- if .Values.postsrsd.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: relay-postsrsd
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: relay-postsrsd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: relay-postsrsd
+  template:
+    metadata:
+      labels:
+        app: relay-postsrsd
+    spec:
+      containers:
+        - name: postsrsd
+          image: "{{ .Values.image.postsrsd.repository }}:{{ .Values.image.postsrsd.tag }}"
+          imagePullPolicy: {{ .Values.image.postsrsd.pullPolicy }}
+          ports:
+            - containerPort: 10001
+              name: forward
+            - containerPort: 10002
+              name: reverse
+          env:
+            - name: SRS_DOMAIN
+              value: {{ .Values.mail.domain | quote }}
+            {{- if .Values.postsrsd.secretName }}
+            - name: SRS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postsrsd.secretName }}
+                  key: SRS_SECRET
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources.postsrsd | nindent 12 }}
+{{- end }}

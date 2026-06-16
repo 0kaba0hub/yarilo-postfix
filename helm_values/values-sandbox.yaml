@@ -1,0 +1,61 @@
+image:
+  postfix:
+    repository: ghcr.io/0kaba0hub/yarilo-postfix
+    tag: latest
+    pullPolicy: Always
+
+mail:
+  domain: d00001.test
+  hostname: relay.d00001.test
+  mynetworks: "127.0.0.0/8 10.0.0.0/8 10.1.0.0/16"
+
+yarilo:
+  saslLoginAddr: "yarilo-sasl-login.yarilo-sb.svc:12325"
+  lmtpHost: "yarilo-lmtp.yarilo-sb.svc"
+  lmtpPort: "24"
+
+
+
+mysql:
+  secretName: yarilo-postfix-mysql
+
+tls:
+  secretName: yarilo-tls
+
+dkim:
+  secretName: ""
+  selector: mail
+
+mx:
+  enabled: true
+  rblRestrictions: ""
+  rspamd:
+    rejectScore: 15
+    addHeaderScore: 6
+  service:
+    type: ClusterIP
+    port: 25
+
+mta:
+  enabled: true
+  rspamd:
+    rejectScore: 15
+    addHeaderScore: 6
+  service:
+    type: ClusterIP
+    port: 587
+
+fwd:
+  enabled: true
+  lmtpAddr: ""
+  rspamd:
+    rejectScore: 100
+  service:
+    type: ClusterIP
+    port: 25
+
+postsrsd:
+  enabled: true
+  secretName: ""
+  service:
+    type: ClusterIP
