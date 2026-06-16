@@ -6,21 +6,15 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   actions.conf: |
-    actions {
-      reject = {{ .Values.mta.rspamd.rejectScore }};
-      add_header = {{ .Values.mta.rspamd.addHeaderScore }};
-    }
+    reject = {{ .Values.mta.rspamd.rejectScore }};
+    add_header = {{ .Values.mta.rspamd.addHeaderScore }};
   dkim_signing.conf: |
-    dkim_signing {
-      enabled = true;
-      use_domain = "header";
-      selector = {{ .Values.dkim.selector | quote }};
-      path = "/etc/rspamd/dkim/$domain.$selector.key";
-    }
+    enabled = true;
+    use_domain = "header";
+    selector = {{ .Values.dkim.selector | quote }};
+    path = "/etc/rspamd/dkim/$domain.$selector.key";
   rbl.conf: |
-    rbl {
-      enabled = false;
-    }
+    enabled = false;
   worker-proxy.inc: |
     milter = yes;
     timeout = 120s;

@@ -6,16 +6,12 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   actions.conf: |
-    actions {
-      reject = {{ .Values.mx.rspamd.rejectScore }};
-      add_header = {{ .Values.mx.rspamd.addHeaderScore }};
-      greylist = 4;
-    }
+    reject = {{ .Values.mx.rspamd.rejectScore }};
+    add_header = {{ .Values.mx.rspamd.addHeaderScore }};
+    greylist = 4;
   milter_headers.conf: |
-    milter_headers {
-      use = ["x-spamd-bar", "x-spam-level", "x-spam-status", "authentication-results"];
-      authenticated_headers = ["authentication-results"];
-    }
+    use = ["x-spamd-bar", "x-spam-level", "x-spam-status", "authentication-results"];
+    authenticated_headers = ["authentication-results"];
   worker-proxy.inc: |
     milter = yes;
     timeout = 120s;
