@@ -39,9 +39,7 @@ spec:
             - name: RSPAMD_ADDR
               value: "relay-rspamd-fwd:11332"
             - name: POSTSRSD_ADDR
-              value: "relay-postsrsd:10001"
-            - name: POSTSRSD_REVERSE_ADDR
-              value: "relay-postsrsd:10002"
+              value: "relay-postsrsd:10003"
             {{- if .Values.fwd.lmtpAddr }}
             - name: LMTP_ADDR
               value: {{ .Values.fwd.lmtpAddr | quote }}

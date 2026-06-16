@@ -3,8 +3,7 @@ set -eu
 . /common.sh
 
 RSPAMD_ADDR="${RSPAMD_ADDR:-localhost:11332}"
-POSTSRSD_ADDR="${POSTSRSD_ADDR:-yarilo-postsrsd:10001}"
-POSTSRSD_REVERSE_ADDR="${POSTSRSD_REVERSE_ADDR:-yarilo-postsrsd:10002}"
+POSTSRSD_ADDR="${POSTSRSD_ADDR:-yarilo-postsrsd:10003}"
 LMTP_ADDR="${LMTP_ADDR:-}"
 
 postconf -e "relayhost ="
@@ -15,9 +14,9 @@ if [ -n "${LMTP_ADDR}" ]; then
     postconf -e "lmtp_host_lookup = native"
 fi
 
-postconf -e "sender_canonical_maps = tcp:${POSTSRSD_ADDR}"
+postconf -e "sender_canonical_maps = socketmap:inet:${POSTSRSD_ADDR}:forward"
 postconf -e "sender_canonical_classes = envelope_sender"
-postconf -e "recipient_canonical_maps = tcp:${POSTSRSD_REVERSE_ADDR}"
+postconf -e "recipient_canonical_maps = socketmap:inet:${POSTSRSD_ADDR}:reverse"
 postconf -e "recipient_canonical_classes = envelope_recipient,header_recipient"
 
 postconf -e "smtpd_relay_restrictions = permit_mynetworks reject_unauth_destination"
