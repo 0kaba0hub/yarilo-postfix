@@ -17,7 +17,8 @@ yarilo:
 
 
 mysql:
-  secretName: yarilo-postfix-mysql
+  secretName: yarilo-mysql
+  host: "yarilo-mysql.yarilo-sb.svc"
 
 tls:
   secretName: yarilo-tls

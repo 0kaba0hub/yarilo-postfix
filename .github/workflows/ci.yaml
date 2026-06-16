@@ -24,7 +24,7 @@ env:
 jobs:
   lint:
     name: Lint
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -48,7 +48,7 @@ jobs:
     name: Build & Push
     if: github.event_name == 'push'
     needs: [lint]
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     concurrency:
       group: build-main-${{ github.ref }}
       cancel-in-progress: false
