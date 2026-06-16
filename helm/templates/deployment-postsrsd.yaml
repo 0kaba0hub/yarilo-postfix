@@ -21,6 +21,8 @@ spec:
           image: "{{ .Values.image.postsrsd.repository }}:{{ .Values.image.postsrsd.tag }}"
           imagePullPolicy: {{ .Values.image.postsrsd.pullPolicy }}
           ports:
+            - containerPort: 10001
+              name: milter
             - containerPort: 10003
               name: socketmap
           env:

@@ -11,6 +11,9 @@ spec:
   selector:
     app: relay-postsrsd
   ports:
+    - name: milter
+      port: 10001
+      targetPort: milter
     - name: socketmap
       port: 10003
       targetPort: socketmap

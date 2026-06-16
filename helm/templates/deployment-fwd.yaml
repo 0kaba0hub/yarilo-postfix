@@ -38,8 +38,8 @@ spec:
               value: {{ include "yarilo-postfix.mailDomains" . | quote }}
             - name: RSPAMD_ADDR
               value: "relay-rspamd-fwd:11332"
-            - name: POSTSRSD_ADDR
-              value: "relay-postsrsd:10003"
+            - name: POSTSRSD_HOST
+              value: "relay-postsrsd"
             {{- if .Values.fwd.lmtpAddr }}
             - name: LMTP_ADDR
               value: {{ .Values.fwd.lmtpAddr | quote }}
