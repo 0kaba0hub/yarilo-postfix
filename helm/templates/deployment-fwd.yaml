@@ -25,6 +25,8 @@ spec:
           ports:
             - containerPort: 25
               name: smtp
+            - containerPort: 587
+              name: submission
           env:
             - name: RELAY_TYPE
               value: fwd
@@ -47,6 +49,10 @@ spec:
             {{- if .Values.fwd.lmtpAddr }}
             - name: LMTP_ADDR
               value: {{ .Values.fwd.lmtpAddr | quote }}
+            {{- end }}
+            {{- if .Values.fwd.saslLoginAddr }}
+            - name: SASL_LOGIN_ADDR
+              value: {{ .Values.fwd.saslLoginAddr | quote }}
             {{- end }}
             {{- include "yarilo-postfix.mysqlEnv" .Values | nindent 12 }}
           volumeMounts:
