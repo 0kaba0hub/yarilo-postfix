@@ -56,6 +56,8 @@ mta:
 fwd:
   enabled: true
   lmtpAddr: ""
+  saslUser: "sieve_relay"
+  saslSecretName: "fwd-sasl-secret"
   service:
     type: ClusterIP
     port: 25
