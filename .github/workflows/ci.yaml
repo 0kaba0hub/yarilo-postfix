@@ -19,6 +19,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE: ghcr.io/${{ github.repository_owner }}/yarilo-postfix
+  IMAGE_POSTSRSD: ghcr.io/${{ github.repository_owner }}/postsrsd
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
@@ -30,10 +31,16 @@ jobs:
     steps:
       - uses: actions/checkout@v6.0.3
 
-      - name: hadolint
+      - name: hadolint postfix
         uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: docker/postfix/Dockerfile
+          ignore: DL3018
+
+      - name: hadolint postsrsd
+        uses: hadolint/hadolint-action@v3.3.0
+        with:
+          dockerfile: docker/postsrsd/Dockerfile
           ignore: DL3018
 
       - name: Set up Helm
@@ -87,7 +94,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
+      - name: Extract metadata (postfix)
         id: meta
         uses: docker/metadata-action@v6.1.0
         with:
@@ -97,7 +104,7 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ steps.version.outputs.image_tag }},enable=${{ steps.version.outputs.is_release == 'true' }}
 
-      - name: Build and push
+      - name: Build and push postfix
         uses: docker/build-push-action@v7.2.0
         with:
           context: docker/postfix
@@ -105,6 +112,24 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Extract metadata (postsrsd)
+        id: meta-postsrsd
+        uses: docker/metadata-action@v6.1.0
+        with:
+          images: ${{ env.IMAGE_POSTSRSD }}
+          tags: |
+            type=sha,prefix=,format=short
+            type=raw,value=latest
+
+      - name: Build and push postsrsd
+        uses: docker/build-push-action@v7.2.0
+        with:
+          context: docker/postsrsd
+          push: true
+          platforms: linux/amd64
+          tags: ${{ steps.meta-postsrsd.outputs.tags }}
+          labels: ${{ steps.meta-postsrsd.outputs.labels }}
 
       - name: Generate release notes
         if: steps.version.outputs.is_release == 'true'
@@ -130,10 +155,19 @@ jobs:
           name: ${{ steps.version.outputs.tag }}
           body_path: RELEASE_NOTES.md
 
-      - name: Cleanup old GHCR versions
+      - name: Cleanup old GHCR versions (postfix)
         uses: actions/delete-package-versions@v5
         with:
           package-name: yarilo-postfix
+          package-type: container
+          min-versions-to-keep: 10
+          ignore-versions: '^\d+\.\d+\.\d+$'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup old GHCR versions (postsrsd)
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: postsrsd
           package-type: container
           min-versions-to-keep: 10
           ignore-versions: '^\d+\.\d+\.\d+$'
