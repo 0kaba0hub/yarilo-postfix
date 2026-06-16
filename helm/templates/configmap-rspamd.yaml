@@ -14,6 +14,20 @@ data:
     enabled = false;
   antivirus.conf: |
     enabled = false;
+  neural.conf: |
+    enabled = false;
+  fuzzy_check.conf: |
+    enabled = false;
+  url_redirector.conf: |
+    enabled = false;
+  replies.conf: |
+    enabled = false;
+  greylist.conf: |
+    enabled = false;
+  classifier-bayes.conf: |
+    enabled = false;
+  worker-normal.inc: |
+    count = 1;
   worker-proxy.inc: |
     milter = yes;
     timeout = 120s;
