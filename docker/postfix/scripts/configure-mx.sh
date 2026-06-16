@@ -10,6 +10,7 @@ RBL_RESTRICTIONS="${RBL_RESTRICTIONS:-}"
 postconf -e "relayhost ="
 postconf -e "virtual_mailbox_domains = mysql:/etc/postfix/mysql-domains.cf"
 postconf -e "virtual_alias_maps = mysql:/etc/postfix/mysql-aliases.cf"
+postconf -e "virtual_mailbox_maps = mysql:/etc/postfix/mysql-mailbox.cf"
 postconf -e "virtual_transport = lmtp:[${LMTP_HOST}]:${LMTP_PORT}"
 postconf -e "lmtp_destination_recipient_limit = 1"
 
