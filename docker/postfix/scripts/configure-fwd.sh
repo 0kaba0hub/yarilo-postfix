@@ -38,18 +38,21 @@ if [ -f "/run/postfix/tls/tls.crt" ]; then
     _sasl_opts="  -o smtpd_relay_restrictions=permit_mynetworks,reject"
 
     if [ -n "${SASL_USER}" ] && [ -n "${SASL_PASSWORD}" ]; then
-        mkdir -p /etc/sasl2
-        cat > /etc/sasl2/smtpd.conf << 'SASLCF'
+        cat > /etc/postfix/sasl/smtpd.conf << 'SASLCF'
 pwcheck_method: auxprop
 auxprop_plugin: sasldb
+sasldb_path: /etc/sasldb2
 mech_list: PLAIN LOGIN
 SASLCF
-        echo "${SASL_PASSWORD}" | saslpasswd2 -c -p -u "${MAIL_DOMAIN}" "${SASL_USER}"
+        cp /etc/postfix/sasl/smtpd.conf /etc/sasl2/smtpd.conf
+        printf '%s' "${SASL_PASSWORD}" | saslpasswd2 -c -f /etc/sasldb2 -u "${MAIL_DOMAIN}" -p "${SASL_USER}"
+        chown postfix:postfix /etc/sasldb2
         chmod 640 /etc/sasldb2
         postconf -e "smtpd_sasl_type = cyrus"
         postconf -e "smtpd_sasl_path = smtpd"
         postconf -e "smtpd_sasl_auth_enable = yes"
         postconf -e "smtpd_sasl_security_options = noanonymous"
+        postconf -e "cyrus_sasl_config_path = /etc/sasl2"
         _sasl_opts="  -o smtpd_sasl_auth_enable=yes
   -o smtpd_relay_restrictions=permit_mynetworks,permit_sasl_authenticated,reject"
     fi
