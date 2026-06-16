@@ -5,6 +5,7 @@ set -eu
 LMTP_HOST="${LMTP_HOST:-yarilo-lmtp}"
 LMTP_PORT="${LMTP_PORT:-24}"
 RSPAMD_ADDR="${RSPAMD_ADDR:-localhost:11332}"
+OPENDKIM_ADDR="${OPENDKIM_ADDR:-}"
 SASL_LOGIN_ADDR="${SASL_LOGIN_ADDR:-yarilo-sasl-login:12325}"
 
 postconf -e "relayhost ="
@@ -28,10 +29,14 @@ cat > /etc/postfix/sender_login_maps << 'EOF'
 /^(.+)$/       ${1}
 EOF
 
+_milters="inet:${RSPAMD_ADDR}"
+if [ -n "${OPENDKIM_ADDR}" ]; then
+    _milters="${_milters},inet:${OPENDKIM_ADDR}"
+fi
 postconf -e "milter_default_action = accept"
 postconf -e "milter_protocol = 6"
-postconf -e "smtpd_milters = inet:${RSPAMD_ADDR}"
-postconf -e "non_smtpd_milters = inet:${RSPAMD_ADDR}"
+postconf -e "smtpd_milters = ${_milters}"
+postconf -e "non_smtpd_milters = ${_milters}"
 
 if [ -f "/run/postfix/tls/tls.crt" ]; then
     cat >> /etc/postfix/master.cf << EOF

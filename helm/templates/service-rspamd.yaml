@@ -1,0 +1,17 @@
+{{- if or .Values.mx.enabled .Values.mta.enabled .Values.fwd.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: relay-rspamd
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: relay-rspamd
+  ports:
+    - name: milter
+      port: 11332
+      targetPort: 11332
+    - name: controller
+      port: 11333
+      targetPort: 11333
+{{- end }}

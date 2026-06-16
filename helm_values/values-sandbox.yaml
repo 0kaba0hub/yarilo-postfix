@@ -14,8 +14,6 @@ yarilo:
   lmtpHost: "yarilo-lmtp.yarilo-sb.svc"
   lmtpPort: "24"
 
-
-
 mysql:
   secretName: yarilo-mysql
   host: "yarilo-mysql.yarilo-sb.svc"
@@ -24,24 +22,24 @@ tls:
   secretName: yarilo-tls
 
 dkim:
-  secretName: ""
-  selector: mail
+  selector: defaultmail
+
+rspamd:
+  rejectScore: 15
+  addHeaderScore: 6
+
+opendkim:
+  enabled: false
 
 mx:
   enabled: true
   rblRestrictions: ""
-  rspamd:
-    rejectScore: 15
-    addHeaderScore: 6
   service:
     type: ClusterIP
     port: 25
 
 mta:
   enabled: true
-  rspamd:
-    rejectScore: 15
-    addHeaderScore: 6
   service:
     type: ClusterIP
     port: 587
@@ -49,8 +47,6 @@ mta:
 fwd:
   enabled: true
   lmtpAddr: ""
-  rspamd:
-    rejectScore: 100
   service:
     type: ClusterIP
     port: 25

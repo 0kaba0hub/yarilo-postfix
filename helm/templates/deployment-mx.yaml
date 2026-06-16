@@ -41,7 +41,7 @@ spec:
             - name: LMTP_PORT
               value: {{ .Values.yarilo.lmtpPort | quote }}
             - name: RSPAMD_ADDR
-              value: "relay-rspamd-mx:11332"
+              value: "relay-rspamd:11332"
             {{- if .Values.mx.rblRestrictions }}
             - name: RBL_RESTRICTIONS
               value: {{ .Values.mx.rblRestrictions | quote }}

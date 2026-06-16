@@ -1,18 +1,15 @@
-{{- if .Values.fwd.enabled }}
+{{- if or .Values.mx.enabled .Values.mta.enabled .Values.fwd.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: rspamd-fwd-config
+  name: relay-rspamd-config
   namespace: {{ .Release.Namespace }}
 data:
   actions.conf: |
-    reject = {{ .Values.fwd.rspamd.rejectScore }};
-    add_header = {{ .Values.fwd.rspamd.rejectScore }};
+    reject = {{ .Values.rspamd.rejectScore }};
+    add_header = {{ .Values.rspamd.addHeaderScore }};
   dkim_signing.conf: |
-    enabled = true;
-    use_domain = "envelope";
-    selector = {{ .Values.dkim.selector | quote }};
-    path = "/etc/rspamd/dkim/$domain.$selector.key";
+    enabled = false;
   rbl.conf: |
     enabled = false;
   antivirus.conf: |
