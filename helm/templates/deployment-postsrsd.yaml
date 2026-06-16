@@ -39,6 +39,10 @@ spec:
             - name: SRS_REDIS_ADDR
               value: {{ .Values.postsrsd.redisAddr | quote }}
             {{- end }}
+            {{- if .Values.postsrsd.debug }}
+            - name: SRS_DEBUG
+              value: "on"
+            {{- end }}
           resources:
             {{- toYaml .Values.resources.postsrsd | nindent 12 }}
 {{- end }}

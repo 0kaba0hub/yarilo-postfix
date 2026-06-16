@@ -72,6 +72,7 @@ postsrsd:
   domain: ""
   secretName: ""
   redisAddr: ""
+  debug: false
   service:
     type: ClusterIP
 
