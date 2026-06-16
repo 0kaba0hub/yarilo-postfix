@@ -13,12 +13,9 @@ Mail domains: mail.domain + extraDomains (if set).
 MySQL env vars from secret.
 */}}
 {{- define "yarilo-postfix.mysqlEnv" -}}
-{{- if .mysql.secretName }}
 - name: MYSQL_HOST
-  valueFrom:
-    secretKeyRef:
-      name: {{ .mysql.secretName }}
-      key: MYSQL_HOST
+  value: {{ .mysql.host | quote }}
+{{- if .mysql.secretName }}
 - name: MYSQL_USER
   valueFrom:
     secretKeyRef:
@@ -33,7 +30,7 @@ MySQL env vars from secret.
   valueFrom:
     secretKeyRef:
       name: {{ .mysql.secretName }}
-      key: MYSQL_DBNAME
+      key: MYSQL_DATABASE
 {{- end }}
 {{- end -}}
 
