@@ -5,7 +5,7 @@ image:
     pullPolicy: Always
   rspamd:
     repository: rspamd/rspamd
-    tag: "3.11.1"
+    tag: "4.1.0"
     pullPolicy: IfNotPresent
   postsrsd:
     repository: ghcr.io/0kaba0hub/postsrsd
