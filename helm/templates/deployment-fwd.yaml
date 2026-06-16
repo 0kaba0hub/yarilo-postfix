@@ -50,9 +50,16 @@ spec:
             - name: LMTP_ADDR
               value: {{ .Values.fwd.lmtpAddr | quote }}
             {{- end }}
-            {{- if .Values.fwd.saslLoginAddr }}
-            - name: SASL_LOGIN_ADDR
-              value: {{ .Values.fwd.saslLoginAddr | quote }}
+            {{- if .Values.fwd.saslUser }}
+            - name: SASL_USER
+              value: {{ .Values.fwd.saslUser | quote }}
+            {{- end }}
+            {{- if .Values.fwd.saslSecretName }}
+            - name: SASL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.fwd.saslSecretName }}
+                  key: password
             {{- end }}
             {{- include "yarilo-postfix.mysqlEnv" .Values | nindent 12 }}
           volumeMounts:

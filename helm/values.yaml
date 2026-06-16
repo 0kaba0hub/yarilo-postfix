@@ -64,7 +64,8 @@ mta:
 fwd:
   enabled: false
   lmtpAddr: ""
-  saslLoginAddr: ""
+  saslUser: ""
+  saslSecretName: ""
   service:
     type: ClusterIP
     port: 25
