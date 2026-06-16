@@ -35,10 +35,6 @@ MySQL env vars from secret.
       name: {{ .mysql.secretName }}
       key: MYSQL_DBNAME
 {{- end }}
-{{- if .mysql.senderTransportQuery }}
-- name: MYSQL_SENDER_TRANSPORT_QUERY
-  value: {{ .mysql.senderTransportQuery | quote }}
-{{- end }}
 {{- end -}}
 
 {{/*

@@ -2,15 +2,16 @@
 set -eu
 . /common.sh
 
+LMTP_HOST="${LMTP_HOST:-yarilo-lmtp}"
+LMTP_PORT="${LMTP_PORT:-24}"
 RSPAMD_ADDR="${RSPAMD_ADDR:-localhost:11332}"
 SASL_LOGIN_ADDR="${SASL_LOGIN_ADDR:-yarilo-sasl-login:12325}"
 
 postconf -e "relayhost ="
 postconf -e "virtual_mailbox_domains = mysql:/etc/postfix/mysql-domains.cf"
 postconf -e "virtual_alias_maps = mysql:/etc/postfix/mysql-aliases.cf"
-postconf -e "transport_maps = hash:/etc/postfix/transport"
-postconf -e "sender_dependent_default_transport_maps = mysql:/etc/postfix/mysql-sender-transport.cf, \$transport_maps"
-postconf -e "lmtp_host_lookup = native"
+postconf -e "virtual_transport = lmtp:[${LMTP_HOST}]:${LMTP_PORT}"
+postconf -e "lmtp_destination_recipient_limit = 1"
 
 postconf -e "smtpd_sasl_type = dovecot"
 postconf -e "smtpd_sasl_path = inet:${SASL_LOGIN_ADDR}"

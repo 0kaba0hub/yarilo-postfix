@@ -11,7 +11,10 @@ mail:
 
 yarilo:
   saslLoginAddr: "yarilo-sasl-login.yarilo-sb.svc:12325"
-  lmtpAddr: "yarilo-lmtp.yarilo-sb.svc:24"
+  lmtpHost: "yarilo-lmtp.yarilo-sb.svc"
+  lmtpPort: "24"
+
+
 
 mysql:
   secretName: yarilo-postfix-mysql

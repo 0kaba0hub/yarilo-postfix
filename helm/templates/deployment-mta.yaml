@@ -38,8 +38,10 @@ spec:
               value: {{ .Values.mail.mynetworks | quote }}
             - name: MAIL_DOMAINS
               value: {{ include "yarilo-postfix.mailDomains" . | quote }}
-            - name: LMTP_ADDR
-              value: {{ .Values.yarilo.lmtpAddr | quote }}
+            - name: LMTP_HOST
+              value: {{ .Values.yarilo.lmtpHost | quote }}
+            - name: LMTP_PORT
+              value: {{ .Values.yarilo.lmtpPort | quote }}
             - name: SASL_LOGIN_ADDR
               value: {{ .Values.yarilo.saslLoginAddr | quote }}
             - name: RSPAMD_ADDR

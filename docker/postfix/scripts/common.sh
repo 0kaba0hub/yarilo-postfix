@@ -30,19 +30,10 @@ _gen_mysql_cf() {
     chmod 640 "${_file}"
 }
 
-MYSQL_SENDER_TRANSPORT_QUERY="${MYSQL_SENDER_TRANSPORT_QUERY:-SELECT transport FROM domain WHERE domain='%d' AND active=1}"
-
 _gen_mysql_cf /etc/postfix/mysql-domains.cf \
     "SELECT domain FROM domain WHERE domain='%s' AND active=1"
-_gen_mysql_cf /etc/postfix/mysql-transport.cf \
-    "SELECT transport FROM domain WHERE domain='%s' AND active=1"
 _gen_mysql_cf /etc/postfix/mysql-aliases.cf \
     "SELECT goto FROM alias WHERE address='%s' AND active=1"
-_gen_mysql_cf /etc/postfix/mysql-sender-transport.cf \
-    "${MYSQL_SENDER_TRANSPORT_QUERY}"
-
-touch /etc/postfix/transport
-postmap /etc/postfix/transport
 
 postconf -e "smtp_tls_security_level = may"
 postconf -e "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt"

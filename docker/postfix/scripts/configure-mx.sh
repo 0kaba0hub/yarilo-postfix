@@ -2,14 +2,16 @@
 set -eu
 . /common.sh
 
+LMTP_HOST="${LMTP_HOST:-yarilo-lmtp}"
+LMTP_PORT="${LMTP_PORT:-24}"
 RSPAMD_ADDR="${RSPAMD_ADDR:-localhost:11332}"
 RBL_RESTRICTIONS="${RBL_RESTRICTIONS:-}"
 
 postconf -e "relayhost ="
 postconf -e "virtual_mailbox_domains = mysql:/etc/postfix/mysql-domains.cf"
 postconf -e "virtual_alias_maps = mysql:/etc/postfix/mysql-aliases.cf"
-postconf -e "transport_maps = mysql:/etc/postfix/mysql-transport.cf"
-postconf -e "lmtp_host_lookup = native"
+postconf -e "virtual_transport = lmtp:[${LMTP_HOST}]:${LMTP_PORT}"
+postconf -e "lmtp_destination_recipient_limit = 1"
 
 postconf -e "smtpd_relay_restrictions = permit_mynetworks reject_unauth_destination"
 postconf -e "smtpd_helo_required = yes"
