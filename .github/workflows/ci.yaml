@@ -3,51 +3,138 @@ name: CI
 on:
   push:
     branches: [main]
+    paths:
+      - "docker/**"
+      - "helm/**"
+      - "helm_values/**"
+      - ".github/workflows/ci.yaml"
   pull_request:
     branches: [main]
+    paths:
+      - "docker/**"
+      - "helm/**"
+      - "helm_values/**"
+      - ".github/workflows/ci.yaml"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: ghcr.io/${{ github.repository_owner }}/yarilo-postfix
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.3
 
       - name: hadolint
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: docker/postfix/Dockerfile
           ignore: DL3018
 
-      - name: helm lint
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+        with:
+          version: latest
+
+      - name: Lint Helm chart
         run: helm lint helm/
 
   build:
     name: Build & Push
-    runs-on: ubuntu-latest
-    needs: lint
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'push'
+    needs: [lint]
+    runs-on: [self-hosted, linux]
+    concurrency:
+      group: build-main-${{ github.ref }}
+      cancel-in-progress: false
     permissions:
-      contents: read
+      contents: write
       packages: write
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.3
+        with:
+          fetch-depth: 0
 
-      - uses: docker/setup-buildx-action@v3
+      - name: Determine release version
+        id: version
+        run: |
+          APP_VERSION=$(awk '/^appVersion:/{gsub(/"/, ""); print $2}' helm/Chart.yaml)
+          RELEASE_TAG="v${APP_VERSION}"
+          if git ls-remote --tags origin "refs/tags/${RELEASE_TAG}" | grep -q "${RELEASE_TAG}"; then
+            IS_RELEASE=false
+          else
+            IS_RELEASE=true
+          fi
+          echo "tag=${RELEASE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "image_tag=${APP_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "is_release=${IS_RELEASE}" >> "$GITHUB_OUTPUT"
 
-      - uses: docker/login-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4.1.0
+        with:
+          driver: docker
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4.2.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/build-push-action@v6
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v6.1.0
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=sha,prefix=,format=short
+            type=raw,value=latest
+            type=raw,value=${{ steps.version.outputs.image_tag }},enable=${{ steps.version.outputs.is_release == 'true' }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v7.2.0
         with:
           context: docker/postfix
           push: true
           platforms: linux/amd64
-          tags: |
-            ghcr.io/0kaba0hub/yarilo-postfix:latest
-            ghcr.io/0kaba0hub/yarilo-postfix:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Generate release notes
+        if: steps.version.outputs.is_release == 'true'
+        uses: orhun/git-cliff-action@v4
+        id: cliff
+        with:
+          config: cliff.toml
+          args: --unreleased --strip header
+        env:
+          OUTPUT: RELEASE_NOTES.md
+
+      - name: Push git tag
+        if: steps.version.outputs.is_release == 'true'
+        run: |
+          git tag "${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.is_release == 'true'
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          body_path: RELEASE_NOTES.md
+
+      - name: Cleanup old GHCR versions
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: yarilo-postfix
+          package-type: container
+          min-versions-to-keep: 10
+          ignore-versions: '^\d+\.\d+\.\d+$'
+          token: ${{ secrets.GITHUB_TOKEN }}
