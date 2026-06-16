@@ -22,18 +22,22 @@ spec:
           imagePullPolicy: {{ .Values.image.postsrsd.pullPolicy }}
           ports:
             - containerPort: 10001
-              name: forward
-            - containerPort: 10002
-              name: reverse
+              name: milter
+            - containerPort: 10003
+              name: socketmap
           env:
             - name: SRS_DOMAIN
-              value: {{ .Values.mail.domain | quote }}
+              value: {{ .Values.postsrsd.domain | default .Values.mail.domain | quote }}
             {{- if .Values.postsrsd.secretName }}
             - name: SRS_SECRET
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.postsrsd.secretName }}
                   key: SRS_SECRET
+            {{- end }}
+            {{- if .Values.postsrsd.redisAddr }}
+            - name: SRS_REDIS_ADDR
+              value: {{ .Values.postsrsd.redisAddr | quote }}
             {{- end }}
           resources:
             {{- toYaml .Values.resources.postsrsd | nindent 12 }}

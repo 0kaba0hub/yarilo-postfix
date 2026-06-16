@@ -8,8 +8,8 @@ image:
     tag: "3.11.1"
     pullPolicy: IfNotPresent
   postsrsd:
-    repository: ghcr.io/roehling/postsrsd
-    tag: "2.0.8"
+    repository: ghcr.io/0kaba0hub/postsrsd
+    tag: "2.1.0-3"
     pullPolicy: IfNotPresent
 
 mail:
@@ -69,7 +69,9 @@ fwd:
 
 postsrsd:
   enabled: false
+  domain: ""
   secretName: ""
+  redisAddr: ""
   service:
     type: ClusterIP
 

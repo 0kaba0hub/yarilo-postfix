@@ -11,10 +11,10 @@ spec:
   selector:
     app: relay-postsrsd
   ports:
-    - name: forward
+    - name: milter
       port: 10001
-      targetPort: forward
-    - name: reverse
-      port: 10002
-      targetPort: reverse
+      targetPort: milter
+    - name: socketmap
+      port: 10003
+      targetPort: socketmap
 {{- end }}
