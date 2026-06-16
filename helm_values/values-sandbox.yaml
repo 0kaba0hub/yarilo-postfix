@@ -59,5 +59,6 @@ postsrsd:
   enabled: true
   domain: mail-sb.seconddns.com
   secretName: postsrsd-secret
+  debug: true
   service:
     type: ClusterIP
