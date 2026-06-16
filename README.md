@@ -4,17 +4,38 @@ Postfix relay stack for the yarilo mail platform. Ships three independent deploy
 
 ## Architecture
 
+rspamd integrates with Postfix via the **milter protocol** (TCP `:11332`). Postfix calls rspamd during SMTP session processing — rspamd is not a proxy in the delivery chain. Each type has its own rspamd instance with a type-specific config.
+
 ```
-Internet ──► MX (port 25)  ──► rspamd-mx ──► yarilo-lmtp
-                                              (spam scan, RBL)
+MX
+  Internet ──► Postfix :25
+                  │  milter
+                  ├──────────► rspamd-mx :11332
+                  │            (spam scan, RBL checks)
+                  │            returns: accept / reject / add_header
+                  │
+                  └── accept ──► yarilo-lmtp :24
 
-yarilo ─────► MTA (port 587) ──► rspamd-mta ──► yarilo-lmtp
- users        (SASL auth)        (DKIM sign)     (local delivery)
-                    │
-                    └──► relayhost (external)
+MTA
+  User ──► Postfix :587
+            │  SASL auth
+            ├──────────────────► yarilo-sasl-login :12325
+            │  milter
+            ├──────────► rspamd-mta :11332
+            │            (outbound scan, DKIM sign)
+            │
+            ├── local domain ──► yarilo-lmtp :24
+            └── external     ──► relayhost / direct
 
-yarilo Sieve ──► FWD (port 25) ──► postsrsd ──► rspamd-fwd ──► external MX
- (redirect)                        (SRS)         (DKIM sign)
+FWD
+  yarilo Sieve ──► Postfix :25
+  (redirect)         │  SRS rewrite
+                     ├──────────────► postsrsd :10001/:10002
+                     │  milter
+                     ├──────────► rspamd-fwd :11332
+                     │            (DKIM sign)
+                     │
+                     └──────────────► external MX
 ```
 
 ## Components
