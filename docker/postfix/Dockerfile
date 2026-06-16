@@ -1,6 +1,7 @@
 FROM alpine:3.23
 RUN apk add --no-cache \
     postfix \
+    postfix-mysql \
     postfix-pcre \
     ca-certificates
 COPY scripts/entrypoint.sh /entrypoint.sh

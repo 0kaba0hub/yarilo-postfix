@@ -44,6 +44,7 @@ spec:
             - name: RBL_RESTRICTIONS
               value: {{ .Values.mx.rblRestrictions | quote }}
             {{- end }}
+            {{- include "yarilo-postfix.mysqlEnv" .Values | nindent 12 }}
           volumeMounts:
             {{- include "yarilo-postfix.tlsMount" .Values.tls.secretName | nindent 12 }}
           resources:

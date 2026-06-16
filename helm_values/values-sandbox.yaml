@@ -13,6 +13,9 @@ yarilo:
   saslLoginAddr: "yarilo-sasl-login.yarilo-sb.svc:12325"
   lmtpAddr: "yarilo-lmtp.yarilo-sb.svc:24"
 
+mysql:
+  secretName: yarilo-postfix-mysql
+
 tls:
   secretName: yarilo-tls
 

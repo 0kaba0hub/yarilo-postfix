@@ -44,6 +44,7 @@ spec:
               value: {{ .Values.yarilo.saslLoginAddr | quote }}
             - name: RSPAMD_ADDR
               value: "relay-rspamd-mta:11332"
+            {{- include "yarilo-postfix.mysqlEnv" .Values | nindent 12 }}
           volumeMounts:
             {{- include "yarilo-postfix.tlsMount" .Values.tls.secretName | nindent 12 }}
           resources:

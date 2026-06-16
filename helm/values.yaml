@@ -23,6 +23,11 @@ yarilo:
   saslLoginAddr: ""
   lmtpAddr: ""
 
+mysql:
+  secretName: ""
+  # Override the sender-transport query (default: SELECT transport FROM domain WHERE domain='%d' AND active=1).
+  senderTransportQuery: ""
+
 tls:
   secretName: ""
 

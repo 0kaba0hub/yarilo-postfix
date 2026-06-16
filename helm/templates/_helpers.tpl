@@ -10,6 +10,38 @@ Mail domains: mail.domain + extraDomains (if set).
 {{- end -}}
 
 {{/*
+MySQL env vars from secret.
+*/}}
+{{- define "yarilo-postfix.mysqlEnv" -}}
+{{- if .mysql.secretName }}
+- name: MYSQL_HOST
+  valueFrom:
+    secretKeyRef:
+      name: {{ .mysql.secretName }}
+      key: MYSQL_HOST
+- name: MYSQL_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ .mysql.secretName }}
+      key: MYSQL_USER
+- name: MYSQL_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .mysql.secretName }}
+      key: MYSQL_PASSWORD
+- name: MYSQL_DBNAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ .mysql.secretName }}
+      key: MYSQL_DBNAME
+{{- end }}
+{{- if .mysql.senderTransportQuery }}
+- name: MYSQL_SENDER_TRANSPORT_QUERY
+  value: {{ .mysql.senderTransportQuery | quote }}
+{{- end }}
+{{- end -}}
+
+{{/*
 TLS volume mount — no-op when secretName is empty.
 */}}
 {{- define "yarilo-postfix.tlsMount" -}}

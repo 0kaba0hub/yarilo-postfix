@@ -46,6 +46,7 @@ spec:
             - name: LMTP_ADDR
               value: {{ .Values.fwd.lmtpAddr | quote }}
             {{- end }}
+            {{- include "yarilo-postfix.mysqlEnv" .Values | nindent 12 }}
           volumeMounts:
             {{- include "yarilo-postfix.tlsMount" .Values.tls.secretName | nindent 12 }}
           resources:

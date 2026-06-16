@@ -17,6 +17,33 @@ postconf -e "maillog_file = /dev/stdout"
 postconf -e "mynetworks = ${MAIL_MYNETWORKS}"
 postconf -e "smtpd_banner = \$myhostname ESMTP"
 
+MYSQL_HOST="${MYSQL_HOST:-localhost}"
+MYSQL_USER="${MYSQL_USER:-postfix}"
+MYSQL_PASSWORD="${MYSQL_PASSWORD:-}"
+MYSQL_DBNAME="${MYSQL_DBNAME:-yarilo}"
+
+_gen_mysql_cf() {
+    local _file="$1" _query="$2"
+    printf 'hosts = %s\nuser = %s\npassword = %s\ndbname = %s\nquery = %s\n' \
+        "${MYSQL_HOST}" "${MYSQL_USER}" "${MYSQL_PASSWORD}" "${MYSQL_DBNAME}" "${_query}" \
+        > "${_file}"
+    chmod 640 "${_file}"
+}
+
+MYSQL_SENDER_TRANSPORT_QUERY="${MYSQL_SENDER_TRANSPORT_QUERY:-SELECT transport FROM domain WHERE domain='%d' AND active=1}"
+
+_gen_mysql_cf /etc/postfix/mysql-domains.cf \
+    "SELECT domain FROM domain WHERE domain='%s' AND active=1"
+_gen_mysql_cf /etc/postfix/mysql-transport.cf \
+    "SELECT transport FROM domain WHERE domain='%s' AND active=1"
+_gen_mysql_cf /etc/postfix/mysql-aliases.cf \
+    "SELECT goto FROM alias WHERE address='%s' AND active=1"
+_gen_mysql_cf /etc/postfix/mysql-sender-transport.cf \
+    "${MYSQL_SENDER_TRANSPORT_QUERY}"
+
+touch /etc/postfix/transport
+postmap /etc/postfix/transport
+
 postconf -e "smtp_tls_security_level = may"
 postconf -e "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt"
 postconf -e "smtp_tls_loglevel = 1"
