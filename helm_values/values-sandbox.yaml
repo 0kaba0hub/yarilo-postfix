@@ -55,7 +55,7 @@ mta:
 
 fwd:
   enabled: true
-  lmtpAddr: ""
+  lmtpAddr: "yarilo-lmtp-login.yarilo-sb.svc.cluster.local:24"
   saslUser: "sieve_relay"
   saslSecretName: "fwd-sasl-secret"
   service:
