@@ -34,8 +34,8 @@ spec:
               SyslogSuccess       yes
               LogWhy              yes
               InternalHosts       0.0.0.0/0,::/0
-              SigningTable        dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim_keys?keycol=domain?datacol=id
-              KeyTable            dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim_keys?keycol=id?datacol=domain,selector,private_key
+              SigningTable        dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim?keycol=domain?datacol=id
+              KeyTable            dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim?keycol=id?datacol=domain,selector,private_key,public_key
               OversignHeaders     From
               CONF
               exec opendkim -f -x /tmp/opendkim.conf
