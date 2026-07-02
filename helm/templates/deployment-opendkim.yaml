@@ -26,23 +26,23 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              cat > /tmp/opendkim.conf << CONF
-              Mode                s
-              Canonicalization    relaxed/simple
-              Socket              inet:8891@0.0.0.0
-              Syslog              yes
-              SyslogSuccess       yes
-              LogWhy              yes
-              InternalHosts       0.0.0.0/0,::/0
-              SigningTable        dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim?keycol=domain?datacol=id
-              KeyTable            dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim?keycol=id?datacol=domain,selector,private_key,public_key
-              OversignHeaders     From
-              CONF
-              printf '*.*\t-/dev/stdout\n' > /tmp/syslog.conf
-              syslogd -f /tmp/syslog.conf -n &
-              exec opendkim -f -x /tmp/opendkim.conf
+              envsubst < /etc/opendkim-tpl/opendkim.conf.tpl > /etc/opendkim/opendkim.conf
+              syslogd -f /etc/opendkim-tpl/syslog.conf -n &
+              exec opendkim -f -x /etc/opendkim/opendkim.conf
           env:
             {{- include "yarilo-postfix.mysqlEnv" .Values | nindent 12 }}
+          volumeMounts:
+            - name: opendkim-tpl
+              mountPath: /etc/opendkim-tpl
+              readOnly: true
+            - name: opendkim-run
+              mountPath: /etc/opendkim
           resources:
             {{- toYaml .Values.resources.opendkim | nindent 12 }}
+      volumes:
+        - name: opendkim-tpl
+          configMap:
+            name: relay-opendkim-config
+        - name: opendkim-run
+          emptyDir: {}
 {{- end }}
