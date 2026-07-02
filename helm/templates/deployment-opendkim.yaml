@@ -38,6 +38,8 @@ spec:
               KeyTable            dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim?keycol=id?datacol=domain,selector,private_key,public_key
               OversignHeaders     From
               CONF
+              printf '*.*\t-/dev/stdout\n' > /tmp/syslog.conf
+              syslogd -f /tmp/syslog.conf -n &
               exec opendkim -f -x /tmp/opendkim.conf
           env:
             {{- include "yarilo-postfix.mysqlEnv" .Values | nindent 12 }}
