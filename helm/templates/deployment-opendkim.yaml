@@ -26,7 +26,12 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              envsubst < /etc/opendkim-tpl/opendkim.conf.tpl > /etc/opendkim/opendkim.conf
+              sed \
+                -e "s|\${MYSQL_USER}|${MYSQL_USER}|g" \
+                -e "s|\${MYSQL_PASSWORD}|${MYSQL_PASSWORD}|g" \
+                -e "s|\${MYSQL_HOST}|${MYSQL_HOST}|g" \
+                -e "s|\${MYSQL_DBNAME}|${MYSQL_DBNAME}|g" \
+                /etc/opendkim-tpl/opendkim.conf.tpl > /etc/opendkim/opendkim.conf
               syslogd -f /etc/opendkim-tpl/syslog.conf -n &
               exec opendkim -f -x /etc/opendkim/opendkim.conf
           env:
