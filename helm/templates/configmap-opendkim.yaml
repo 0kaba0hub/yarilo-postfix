@@ -1,0 +1,21 @@
+{{- if .Values.opendkim.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: relay-opendkim-config
+  namespace: {{ .Release.Namespace }}
+data:
+  opendkim.conf.tpl: |
+    Mode                s
+    Canonicalization    relaxed/simple
+    Socket              inet:8891@0.0.0.0
+    Syslog              yes
+    SyslogSuccess       yes
+    LogWhy              yes
+    InternalHosts       0.0.0.0/0,::/0
+    SigningTable        dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim?keycol=domain?datacol=id
+    KeyTable            dsn:mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DBNAME}/table=dkim?keycol=id?datacol=domain,selector,private_key,public_key
+    OversignHeaders     From
+  syslog.conf: |
+    *.*    -/dev/stdout
+{{- end }}
