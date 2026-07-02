@@ -8,6 +8,7 @@ data:
   actions.conf: |
     reject = {{ .Values.rspamd.rejectScore }};
     add_header = {{ .Values.rspamd.addHeaderScore }};
+    greylist = null;
   dkim_signing.conf: |
     enabled = false;
   rbl.conf: |
