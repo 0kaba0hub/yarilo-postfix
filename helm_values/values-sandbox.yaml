@@ -16,7 +16,7 @@ yarilo:
 
 mysql:
   secretName: yarilo-mysql
-  host: "yarilo-mysql.yarilo-sb.svc.cluster.local"
+  host: "mysql.db.svc.cluster.local"
 
 tls:
   secretName: yarilo-tls
