@@ -13,6 +13,7 @@ postconf -e "virtual_mailbox_domains = mysql:/etc/postfix/mysql-domains.cf"
 postconf -e "virtual_alias_maps = mysql:/etc/postfix/mysql-aliases.cf"
 postconf -e "virtual_transport = lmtp:[${LMTP_HOST}]:${LMTP_PORT}"
 postconf -e "lmtp_destination_recipient_limit = 1"
+postconf -e "lmtp_assume_final = yes"
 
 postconf -e "smtpd_sasl_type = dovecot"
 postconf -e "smtpd_sasl_path = inet:${SASL_LOGIN_ADDR}"
