@@ -13,6 +13,7 @@ postconf -e "virtual_alias_maps = mysql:/etc/postfix/mysql-aliases.cf"
 postconf -e "virtual_mailbox_maps = mysql:/etc/postfix/mysql-mailbox.cf"
 postconf -e "virtual_transport = lmtp:[${LMTP_HOST}]:${LMTP_PORT}"
 postconf -e "lmtp_destination_recipient_limit = 1"
+postconf -e "lmtp_assume_final = yes"
 
 postconf -e "smtpd_relay_restrictions = permit_mynetworks reject_unauth_destination"
 postconf -e "smtpd_helo_required = yes"
