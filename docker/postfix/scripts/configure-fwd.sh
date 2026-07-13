@@ -12,7 +12,7 @@ SASL_PASSWORD="${SASL_PASSWORD:-}"
 postconf -e "relayhost ="
 
 if [ -n "${LMTP_ADDR}" ]; then
-    postconf -e "virtual_mailbox_domains = ${MAIL_DOMAINS}"
+    postconf -e "virtual_mailbox_domains = mysql:/etc/postfix/mysql-domains.cf"
     postconf -e "virtual_mailbox_maps ="
     postconf -e "virtual_transport = lmtp:inet:${LMTP_ADDR}"
     postconf -e "lmtp_host_lookup = native"
